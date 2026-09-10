@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#C60E2E" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Bareumsan" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="description" content="Belajar Hangeul 7 Hari - Aplikasi belajar bahasa Korea" />
+  
+  <title>Bareumsan - Hangeul 7 Hari</title>
+  
+  <!-- PWA Manifest (inline) -->
+  <link rel="manifest" href='data:application/manifest+json,{"name":"Bareumsan - Hangeul 7 Hari","short_name":"Bareumsan","description":"Belajar Hangeul 7 Hari","start_url":".","display":"standalone","background_color":"%23C60E2E","theme_color":"%23C60E2E","orientation":"portrait","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 512 512%27%3E%3Crect width=%27512%27 height=%27512%27 fill=%27%23C60E2E%27 rx=%27100%27/%3E%3Ctext x=%2750%25%27 y=%2750%25%27 font-size=%27300%27 text-anchor=%27middle%27 dominant-baseline=%27central%27 fill=%27white%27 font-family=%27sans-serif%27 font-weight=%27bold%27%3E한%3C/text%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml","purpose":"any maskable"}]}' />
+  
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23C60E2E' rx='100'/%3E%3Ctext x='50%25' y='50%25' font-size='300' text-anchor='middle' dominant-baseline='central' fill='white' font-family='sans-serif' font-weight='bold'%3E한%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23C60E2E' rx='100'/%3E%3Ctext x='50%25' y='50%25' font-size='300' text-anchor='middle' dominant-baseline='central' fill='white' font-family='sans-serif' font-weight='bold'%3E한%3C/text%3E%3C/svg%3E" />
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+    body { 
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      overscroll-behavior: none;
+    }
+    
+    /* Install Banner */
+    #installBanner {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #C60E2E, #003478);
+      color: white;
+      padding: 16px;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10000;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+      animation: slideUp 0.3s ease;
+    }
+    
+    #installBanner.show {
+      display: flex;
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    
+    #installBanner button {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    
+    .btn-install {
+      background: white;
+      color: #C60E2E;
+    }
+    .btn-install:hover {
+      background: #f0f0f0;
+    }
+    
+    .btn-close-banner {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      padding: 8px 12px;
+    }
+    
+    /* iOS Instructions Modal */
+    #iosModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
+      z-index: 10001;
+    }
+    
+    #iosModal.show {
+      display: flex;
+    }
+    
+    #iosModal .ios-content {
+      background: white;
+      border-radius: 20px 20px 0 0;
+      padding: 24px;
+      width: 100%;
+      max-width: 480px;
+      animation: slideUp 0.3s ease;
+    }
+    
+    /* Splash & lainnya */
+    #splashScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #C60E2E, #003478, #C60E2E);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    
+    #splashScreen.hide {
+      opacity: 0;
+      transform: scale(1.05);
+      pointer-events: none;
+    }
+    
+    #splashScreen .splash-title {
+      font-size: 4rem;
+      font-weight: 800;
+      color: white;
+      letter-spacing: 8px;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      animation: fadeInUp 1s ease;
+    }
+    
+    #splashScreen .splash-sub {
+      font-size: 1.2rem;
+      color: rgba(255,255,255,0.9);
+      margin-top: 0.5rem;
+      letter-spacing: 4px;
+      animation: fadeInUp 1.2s ease;
+    }
+    
+    #splashScreen .splash-loader {
+      margin-top: 2rem;
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255,255,255,0.2);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    #splashScreen .splash-emoji {
+      font-size: 3rem;
+      margin-top: 1rem;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: white;
+      border-radius: 50%;
+      animation: sparkleFloat 3s ease-in-out infinite;
+      opacity: 0;
+    }
+    
+    @keyframes sparkleFloat {
+      0% { opacity: 0; transform: translateY(0) scale(0); }
+      50% { opacity: 1; transform: translateY(-50px) scale(1); }
+      100% { opacity: 0; transform: translateY(-100px) scale(0); }
+    }
+
+    .progress-bar { transition: width 0.5s ease; }
+
+    .badge-done {
+      background: #10b981;
+      color: white;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-reset {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.2s;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .btn-reset:hover {
+      background: rgba(255,255,255,0.3);
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SPLASH SCREEN -->
+  <div id="splashScreen">
+    <div id="sparkles"></div>
+    <div class="splash-title">바름산</div>
+    <div class="splash-sub">Belajar Hangeul 7 Hari</div>
+    <div class="splash-loader"></div>
+    <div class="splash-emoji">🇰🇷</div>
+  </div>
+
+  <!-- INSTALL BANNER -->
+  <div id="installBanner">
+    <div>
+      <div style="font-weight: 700; font-size: 14px;">📱 Install Aplikasi</div>
+      <div style="font-size: 12px; opacity: 0.9;">Buka Bareumsan langsung dari home screen!</div>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn-close-banner" onclick="closeBanner()">Nanti</button>
+      <button class="btn-install" onclick="installApp()">Install</button>
+    </div>
+  </div>
+
+  <!-- iOS INSTRUCTIONS MODAL -->
+  <div id="iosModal" onclick="closeIosModal(event)">
+    <div class="ios-content" onclick="event.stopPropagation()">
+      <div style="text-align: center; margin-bottom: 16px;">
+        <div style="font-size: 40px;">📲</div>
+        <h3 style="font-size: 18px; font-weight: 800; margin-top: 8px; color: #1e293b;">Cara Install di iPhone/iPad</h3>
+      </div>
+      <div style="space-y: 12px; color: #475569; font-size: 14px; line-height: 1.6;">
+        <p style="margin-bottom: 12px;">1. Tap tombol <strong>Share</strong> <span style="font-size: 18px;">⬆️</span> di bawah browser Safari</p>
+        <p style="margin-bottom: 12px;">2. Scroll ke bawah dan pilih <strong>"Add to Home Screen"</strong> <span style="font-size: 18px;">➕</span></p>
+        <p style="margin-bottom: 12px;">3. Tap <strong>"Add"</strong> di kanan atas</p>
+        <p style="margin-bottom: 12px;">4. Icon <strong>Bareumsan</strong> akan muncul di home screen! 🎉</p>
+      </div>
+      <button onclick="closeIosModal()" style="width: 100%; padding: 12px; background: #C60E2E; color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; margin-top: 12px; cursor: pointer;">
+        Mengerti
+      </button>
+    </div>
+  </div>
+
+  <!-- Container App -->
+  <div class="w-full max-w-md bg-white min-h-screen sm:min-h-[840px] sm:rounded-3xl shadow-xl flex flex-col overflow-hidden border border-slate-200" id="appContainer">
+    
+    <header class="bg-[#C60E2E] text-white p-5 flex items-center justify-between shadow-sm">
+      <div class="flex items-center gap-3">
+        <button id="btnBack" class="hidden text-white hover:bg-[#A80C27] p-1.5 rounded-lg transition" onclick="showScreen('home')">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <h1 id="appTitle" class="text-xl font-extrabold tracking-tight">Hangeul 7 Hari 🇰🇷</h1>
+      </div>
+      <button onclick="resetProgress()" class="btn-reset">↺ Reset</button>
+    </header>
+
+    <main class="flex-1 p-5 overflow-y-auto">
+      
+      <section id="screenHome" class="space-y-4">
+        <div class="bg-[#003478]/10 border border-[#003478]/20 p-4 rounded-2xl">
+          <div class="flex justify-between items-center">
+            <div>
+              <h2 class="text-[#003478] font-bold text-base">📚 Progress Belajar</h2>
+              <p class="text-[#003478]/70 text-xs mt-1" id="progressSummary">0 dari 7 hari selesai</p>
+            </div>
+            <div class="bg-[#003478] px-3 py-1 rounded-full text-white text-xs font-bold" id="progressPercent">0%</div>
+          </div>
+          <div class="w-full bg-[#003478]/20 rounded-full h-2 mt-2 overflow-hidden">
+            <div id="progressBar" class="progress-bar bg-[#003478] h-2 rounded-full" style="width: 0%"></div>
+          </div>
+        </div>
+        <div id="dayList" class="space-y-3"></div>
+      </section>
+
+      <section id="screenStudy" class="hidden space-y-5">
+        <div class="flex bg-slate-100 p-1 rounded-xl">
+          <button id="tabLessonBtn" onclick="switchTab('lesson')" class="flex-1 py-2 font-bold text-xs rounded-lg bg-white shadow-sm text-[#C60E2E] transition">Ringkasan Materi</button>
+          <button id="tabQuizBtn" onclick="switchTab('quiz')" class="flex-1 py-2 font-bold text-xs rounded-lg text-slate-500 hover:text-slate-800 transition">Kuis Latihan</button>
+        </div>
+
+        <div id="tabLesson" class="space-y-4">
+          <div id="lessonContent" class="space-y-3 text-slate-700 text-sm"></div>
+          <button onclick="switchTab('quiz')" class="w-full py-3.5 bg-[#C60E2E] hover:bg-[#A80C27] text-white font-bold rounded-xl shadow-md transition">
+            Mulai Kuis Hari Ini 🚀
+          </button>
+        </div>
+
+        <div id="tabQuiz" class="hidden space-y-4">
+          <div id="quizContainer"></div>
+        </div>
+
+        <div id="quizResult" class="hidden text-center py-8 space-y-4">
+          <div class="text-5xl">🎉</div>
+          <h3 class="text-xl font-bold text-slate-800">Latihan Selesai!</h3>
+          <p id="scoreText" class="text-slate-600 text-sm"></p>
+          <button onclick="showScreen('home')" class="px-6 py-3 bg-[#003478] text-white font-bold rounded-xl shadow hover:bg-[#002B5E] transition">
+            Kembali ke Daftar Hari
+          </button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // ============================================
+    // PWA INSTALL LOGIC
+    // ============================================
+    let deferredPrompt = null;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      // Tampilkan banner install
+      if (!isStandalone) {
+        document.getElementById('installBanner').classList.add('show');
+      }
+    });
+
+    function installApp() {
+      if (isIOS) {
+        // iOS tidak support beforeinstallprompt, tampilkan instruksi
+        document.getElementById('iosModal').classList.add('show');
+        document.getElementById('installBanner').classList.remove('show');
+        return;
+      }
+      
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted install');
+            document.getElementById('installBanner').classList.remove('show');
+          }
+          deferredPrompt = null;
+        });
+      } else {
+        // Fallback jika tidak ada prompt (browser tidak support atau sudah install)
+        alert('Aplikasi sudah terinstall atau browser tidak mendukung. Coba buka menu browser → "Install App" atau "Add to Home Screen"');
+      }
+    }
+
+    function closeBanner() {
+      document.getElementById('installBanner').classList.remove('show');
+    }
+
+    function closeIosModal(e) {
+      if (e && e.target !== document.getElementById('iosModal')) return;
+      document.getElementById('iosModal').classList.remove('show');
+    }
+
+    // Tampilkan banner untuk iOS setelah splash (karena iOS tidak support beforeinstallprompt)
+    if (isIOS && !isStandalone) {
+      setTimeout(() => {
+        document.getElementById('installBanner').classList.add('show');
+      }, 3500);
+    }
+
+    // Register Service Worker (inline via blob untuk memudahkan)
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+        const CACHE_NAME = 'bareumsan-v1';
+        const urlsToCache = ['/', './index.html'];
+        
+        self.addEventListener('install', event => {
+          self.skipWaiting();
+        });
+        
+        self.addEventListener('activate', event => {
+          event.waitUntil(self.clients.claim());
+        });
+        
+        self.addEventListener('fetch', event => {
+          event.respondWith(
+            caches.match(event.request).then(response => {
+              return response || fetch(event.request).then(fetchRes => {
+                return caches.open(CACHE_NAME).then(cache => {
+                  cache.put(event.request, fetchRes.clone());
+                  return fetchRes;
+                });
+              });
+            }).catch(() => caches.match('./index.html'))
+          );
+        });
+      `;
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(swUrl).catch(err => console.log('SW error:', err));
+    }
+
+    // ============================================
+    // DATA LENGKAP 7 HARI
+    // ============================================
+    const courseData = [
+      {
+        day: 1, title: "Vokal Dasar (10 Huruf)", desc: "ㅏ, ㅓ, ㅗ, ㅜ, ㅡ, ㅣ, ㅑ, ㅕ, ㅛ, ㅠ",
+        letters: [
+          { char: "ㅏ", rom: "a" }, { char: "ㅓ", rom: "eo" }, { char: "ㅗ", rom: "o" }, { char: "ㅜ", rom: "u" },
+          { char: "ㅡ", rom: "eu" }, { char: "ㅣ", rom: "i" }, { char: "ㅑ", rom: "ya" }, { char: "ㅕ", rom: "yeo" },
+          { char: "ㅛ", rom: "yo" }, { char: "ㅠ", rom: "yu" }
+        ],
+        quizzes: [
+          { q: "Manakah karakter yang berbunyi 'eo'?", options: ["ㅏ", "ㅓ", "ㅗ", "ㅡ"], correct: 1, expl: "Garis tegak dengan strip ke kiri = 'eo'." },
+          { q: "Huruf 'ㅠ' dibaca sebagai...", options: ["yo", "yu", "ya", "yeo"], correct: 1, expl: "ㅠ = yu." },
+          { q: "Manakah huruf yang mewakili bunyi vokal 'o'?", options: ["ㅜ", "ㅗ"], correct: 1, expl: "ㅗ = o." },
+          { q: "Bagaimana cara membaca 'ㅑ'?", options: ["ya", "yeo", "yo", "yu"], correct: 0, expl: "ㅑ = ya." },
+          { q: "Manakah vokal yang berbunyi 'u'?", options: ["ㅗ", "ㅜ", "ㅡ", "ㅣ"], correct: 1, expl: "ㅜ = u." },
+          { q: "Huruf 'ㅕ' dibaca sebagai...", options: ["ya", "yeo", "yo", "yu"], correct: 1, expl: "ㅕ = yeo." },
+          { q: "Manakah vokal yang berbunyi 'i'?", options: ["ㅏ", "ㅓ", "ㅡ", "ㅣ"], correct: 3, expl: "ㅣ = i." },
+          { q: "Huruf 'ㅛ' dibaca sebagai...", options: ["ya", "yeo", "yo", "yu"], correct: 2, expl: "ㅛ = yo." },
+          { q: "Manakah vokal yang berbunyi 'eu'?", options: ["ㅏ", "ㅓ", "ㅡ", "ㅣ"], correct: 2, expl: "ㅡ = eu." },
+          { q: "Pasangan vokal 'ㅏ' dan 'ㅑ' memiliki hubungan...", options: ["a → ya", "o → yo", "Tidak berhubungan"], correct: 0, expl: "ㅏ → ㅑ." },
+          { q: "Manakah vokal yang BUKAN termasuk vokal dasar?", options: ["ㅏ", "ㅑ", "ㅘ", "ㅓ"], correct: 2, expl: "ㅘ = vokal gabungan." },
+          { q: "Huruf 'ㅣ' jika digabung dengan 'ㅏ' membentuk...", options: ["ㅑ", "ㅕ", "ㅛ", "ㅠ"], correct: 0, expl: "ㅏ + ㅣ = ㅑ." },
+          { q: "Manakah pasangan vokal dasar dan versi 'y'-nya?", options: ["ㅓ-ㅕ", "ㅗ-ㅠ", "ㅏ-ㅛ", "ㅜ-ㅑ"], correct: 0, expl: "ㅓ → ㅕ." },
+          { q: "Berapa jumlah total vokal dasar dalam Hangeul?", options: ["6", "8", "10", "12"], correct: 2, expl: "10 vokal dasar." },
+          { q: "Manakah vokal yang berbunyi 'a'?", options: ["ㅏ", "ㅓ", "ㅗ", "ㅜ"], correct: 0, expl: "ㅏ = a." },
+          { q: "Huruf 'ㅗ' dan 'ㅜ' dibedakan berdasarkan...", options: ["Arah garis horizontal", "Posisi vertikal", "Jumlah garis"], correct: 0, expl: "ㅗ atas, ㅜ bawah." },
+          { q: "Manakah yang merupakan vokal 'yeo'?", options: ["ㅕ", "ㅑ", "ㅛ", "ㅠ"], correct: 0, expl: "ㅕ = yeo." },
+          { q: "Urutan ㅏ, ㅑ, ㅓ, ㅕ menunjukkan pola...", options: ["Vokal + y", "Depan ke belakang", "Atas ke bawah"], correct: 0, expl: "ㅏ→ㅑ, ㅓ→ㅕ." },
+          { q: "Manakah vokal yang TIDAK memiliki versi 'y'?", options: ["ㅏ", "ㅓ", "ㅗ", "ㅡ"], correct: 3, expl: "ㅡ tidak punya 'y'." },
+          { q: "Huruf 'ㅠ' adalah gabungan dari...", options: ["ㅜ+ㅣ", "ㅗ+ㅣ", "ㅏ+ㅣ", "ㅓ+ㅣ"], correct: 0, expl: "ㅜ + ㅣ = ㅠ." },
+          { q: "Manakah vokal yang paling unik bunyinya?", options: ["ㅏ", "ㅗ", "ㅡ", "ㅑ"], correct: 2, expl: "ㅡ (eu)." },
+          { q: "Vokal 'ㅑ' + konsonan 'ㄱ' menjadi...", options: ["갸", "겨", "교", "규"], correct: 0, expl: "ㄱ + ㅑ = 갸." }
+        ]
+      },
+      {
+        day: 2, title: "Konsonan Dasar", desc: "ㄱ, ㄴ, ㄷ, ㄹ, ㅁ, ㅂ, ㅅ, ㅇ, ㅈ",
+        letters: [
+          { char: "가", rom: "ga" }, { char: "나", rom: "na" }, { char: "다", rom: "da" },
+          { char: "라", rom: "ra" }, { char: "마", rom: "ma" }, { char: "바", rom: "ba" },
+          { char: "사", rom: "sa" }, { char: "아", rom: "a (silent)" }, { char: "자", rom: "ja" }
+        ],
+        quizzes: [
+          { q: "'나' dibaca sebagai...", options: ["da", "ma", "na", "ra"], correct: 2, expl: "ㄴ + ㅏ = na." },
+          { q: "Kombinasi ㅁ + ㅗ menghasilkan...", options: ["마", "무", "모", "미"], correct: 2, expl: "ㅁ + ㅗ = 모." },
+          { q: "Fungsi 'ㅇ' di awal suku kata?", options: ["'ng'", "Diam", "'h'"], correct: 1, expl: "ㅇ awal = diam." },
+          { q: "Manakah konsonan 's'?", options: ["ㄱ", "ㄴ", "ㅅ", "ㅈ"], correct: 2, expl: "ㅅ = s." },
+          { q: "'바' dibaca sebagai...", options: ["ba", "pa", "ma", "da"], correct: 0, expl: "ㅂ + ㅏ = ba." },
+          { q: "Manakah konsonan 'r'?", options: ["ㄴ", "ㄹ", "ㅁ", "ㅂ"], correct: 1, expl: "ㄹ = r." },
+          { q: "Kombinasi ㅈ + ㅏ menghasilkan...", options: ["자", "차", "카", "타"], correct: 0, expl: "ㅈ + ㅏ = 자." },
+          { q: "Manakah konsonan 'm'?", options: ["ㄴ", "ㄹ", "ㅁ", "ㅂ"], correct: 2, expl: "ㅁ = m." },
+          { q: "'다' dibaca sebagai...", options: ["da", "na", "ra", "ma"], correct: 0, expl: "ㄷ + ㅏ = da." },
+          { q: "Manakah konsonan 'g'?", options: ["ㄱ", "ㄴ", "ㄷ", "ㄹ"], correct: 0, expl: "ㄱ = g." },
+          { q: "'ㅇ' di akhir suku kata berbunyi...", options: ["Diam", "ng", "n", "m"], correct: 1, expl: "ㅇ akhir = ng." },
+          { q: "Kombinasi ㄹ + ㅏ menghasilkan...", options: ["라", "나", "다", "마"], correct: 0, expl: "ㄹ + ㅏ = 라." },
+          { q: "Manakah konsonan 'b'?", options: ["ㅂ", "ㅍ", "ㅃ", "ㅁ"], correct: 0, expl: "ㅂ = b." },
+          { q: "'사' dibaca sebagai...", options: ["sa", "cha", "ja", "ka"], correct: 0, expl: "ㅅ + ㅏ = sa." },
+          { q: "Manakah yang BUKAN konsonan dasar?", options: ["ㄱ", "ㄴ", "ㅋ", "ㅁ"], correct: 2, expl: "ㅋ = aspirasi." },
+          { q: "'ㄱ' + 'ㅏ' menjadi...", options: ["가", "나", "다", "라"], correct: 0, expl: "ㄱ + ㅏ = 가." },
+          { q: "Manakah konsonan 'j'?", options: ["ㅈ", "ㅊ", "ㅉ", "ㅅ"], correct: 0, expl: "ㅈ = j." },
+          { q: "Kombinasi ㅂ + ㅗ menghasilkan...", options: ["바", "보", "부", "비"], correct: 1, expl: "ㅂ + ㅗ = 보." },
+          { q: "Manakah konsonan 'n'?", options: ["ㄱ", "ㄴ", "ㄷ", "ㄹ"], correct: 1, expl: "ㄴ = n." },
+          { q: "'마' dibaca sebagai...", options: ["na", "ma", "ba", "da"], correct: 1, expl: "ㅁ + ㅏ = ma." },
+          { q: "'ㄷ' + 'ㅓ' menjadi...", options: ["다", "더", "도", "두"], correct: 1, expl: "ㄷ + ㅓ = 더." },
+          { q: "Manakah yang BUKAN 9 konsonan dasar?", options: ["ㄲ", "ㄴ", "ㄷ", "ㄹ"], correct: 0, expl: "ㄲ = tegang." }
+        ]
+      },
+      {
+        day: 3, title: "Konsonan Aspirasi & Sisa", desc: "ㅊ, ㅋ, ㅌ, ㅍ, ㅎ",
+        letters: [
+          { char: "차", rom: "cha" }, { char: "카", rom: "ka" }, { char: "타", rom: "ta" },
+          { char: "파", rom: "pa" }, { char: "하", rom: "ha" }
+        ],
+        quizzes: [
+          { q: "'코' dibaca sebagai...", options: ["go", "ko (hembusan)", "to"], correct: 1, expl: "ㅋ = aspirasi ㄱ." },
+          { q: "Manakah yang berbunyi 'cha'?", options: ["자", "카", "차", "하"], correct: 2, expl: "ㅊ + ㅏ = 차." },
+          { q: "Aspirasi dari 'ㄷ' adalah...", options: ["ㅌ", "ㅋ", "ㅍ", "ㅊ"], correct: 0, expl: "ㄷ → ㅌ." },
+          { q: "Manakah konsonan aspirasi?", options: ["ㄱ", "ㄴ", "ㅋ", "ㄷ"], correct: 2, expl: "ㅋ = aspirasi." },
+          { q: "'ㅍ' dibaca sebagai...", options: ["p (hembusan)", "b", "m", "n"], correct: 0, expl: "ㅍ = p hembusan." },
+          { q: "Manakah yang berbunyi 'ha'?", options: ["가", "카", "타", "하"], correct: 3, expl: "ㅎ + ㅏ = 하." },
+          { q: "Aspirasi dari 'ㅂ' adalah...", options: ["ㅍ", "ㅋ", "ㅌ", "ㅊ"], correct: 0, expl: "ㅂ → ㅍ." },
+          { q: "'타' dibaca sebagai...", options: ["da", "ta", "cha", "ka"], correct: 1, expl: "ㅌ + ㅏ = 타." },
+          { q: "Manakah yang BUKAN aspirasi?", options: ["ㅋ", "ㅌ", "ㅎ", "ㄲ"], correct: 3, expl: "ㄲ = tegang." },
+          { q: "'ㅊ' adalah aspirasi dari...", options: ["ㅈ", "ㅅ", "ㄱ", "ㄷ"], correct: 0, expl: "ㅈ → ㅊ." },
+          { q: "Manakah yang berbunyi 'pa'?", options: ["바", "파", "타", "카"], correct: 1, expl: "ㅍ + ㅏ = 파." },
+          { q: "'ㅎ' dibaca sebagai...", options: ["h", "k", "t", "p"], correct: 0, expl: "ㅎ = h." },
+          { q: "Pasangan dasar-aspirasi yang benar?", options: ["ㄱ-ㅋ", "ㄴ-ㅌ", "ㄷ-ㅍ", "ㅂ-ㅊ"], correct: 0, expl: "ㄱ → ㅋ." },
+          { q: "'카' dibaca sebagai...", options: ["ga", "ka (hembusan)", "cha", "ta"], correct: 1, expl: "ㅋ + ㅏ = 카." },
+          { q: "Manakah aspirasi 't'?", options: ["ㄷ", "ㅌ", "ㄸ", "ㅅ"], correct: 1, expl: "ㅌ = t aspirasi." },
+          { q: "'ㅊ' + 'ㅓ' menjadi...", options: ["처", "차", "초", "추"], correct: 0, expl: "ㅊ + ㅓ = 처." },
+          { q: "Manakah yang BUKAN 5 aspirasi?", options: ["ㅊ", "ㅋ", "ㄲ", "ㅍ"], correct: 2, expl: "ㄲ = tegang." },
+          { q: "'파' dibaca sebagai...", options: ["ba", "pa (hembusan)", "ma", "na"], correct: 1, expl: "ㅍ + ㅏ = 파." },
+          { q: "Manakah konsonan 'h'?", options: ["ㄱ", "ㄷ", "ㅎ", "ㅋ"], correct: 2, expl: "ㅎ = h." },
+          { q: "'ㅌ' + 'ㅗ' menjadi...", options: ["타", "토", "투", "테"], correct: 1, expl: "ㅌ + ㅗ = 토." },
+          { q: "Aspirasi dengan hembusan terkuat?", options: ["ㅋ", "ㅌ", "ㅍ", "ㅊ"], correct: 0, expl: "ㅋ paling kuat." },
+          { q: "'ㅎ' + 'ㅣ' menjadi...", options: ["하", "히", "허", "호"], correct: 1, expl: "ㅎ + ㅣ = 히." }
+        ]
+      },
+      {
+        day: 4, title: "Konsonan Tegang (Ganda)", desc: "ㄲ, ㄸ, ㅃ, ㅆ, ㅉ",
+        letters: [
+          { char: "까", rom: "kka" }, { char: "따", rom: "tta" }, { char: "빠", rom: "ppa" },
+          { char: "싸", rom: "ssa" }, { char: "짜", rom: "jja" }
+        ],
+        quizzes: [
+          { q: "Tegang dari 'ㅅ' adalah...", options: ["ㅆ", "ㅉ", "ㄲ"], correct: 0, expl: "ㅅ → ㅆ." },
+          { q: "'짜' dibaca sebagai...", options: ["ja", "cha", "jja (tegang)"], correct: 2, expl: "ㅉ = jja." },
+          { q: "Tegang dari 'ㄱ' adalah...", options: ["ㄲ", "ㅋ", "ㄱ", "ㄴ"], correct: 0, expl: "ㄱ → ㄲ." },
+          { q: "Manakah tegang 't'?", options: ["ㄷ", "ㄸ", "ㅌ", "ㄹ"], correct: 1, expl: "ㄸ = t tegang." },
+          { q: "'빠' dibaca sebagai...", options: ["ba", "pa", "ppa (tegang)", "ma"], correct: 2, expl: "ㅃ = ppa." },
+          { q: "Manakah tegang 'j'?", options: ["ㅈ", "ㅊ", "ㅉ", "ㅅ"], correct: 2, expl: "ㅉ = j tegang." },
+          { q: "'ㄲ' dibaca sebagai...", options: ["g", "k", "kk (tegang)", "ng"], correct: 2, expl: "ㄲ = kk." },
+          { q: "Manakah yang BUKAN tegang?", options: ["ㄲ", "ㄸ", "ㅋ", "ㅃ"], correct: 2, expl: "ㅋ = aspirasi." },
+          { q: "'싸' dibaca sebagai...", options: ["sa", "ssa (tegang)", "cha", "ja"], correct: 1, expl: "ㅆ = ssa." },
+          { q: "Tegang dari 'ㅂ' adalah...", options: ["ㅍ", "ㅃ", "ㅂ", "ㅁ"], correct: 1, expl: "ㅂ → ㅃ." },
+          { q: "Manakah tegang 's'?", options: ["ㅅ", "ㅆ", "ㅈ", "ㅉ"], correct: 1, expl: "ㅆ = s tegang." },
+          { q: "'ㄸ' + 'ㅏ' menjadi...", options: ["다", "따", "타", "라"], correct: 1, expl: "ㄸ + ㅏ = 따." },
+          { q: "Ciri konsonan tegang...", options: ["Hembusan", "Ketegangan otot", "Sengau"], correct: 1, expl: "Dengan tegang." },
+          { q: "'까' dibaca sebagai...", options: ["ga", "ka", "kka (tegang)", "nga"], correct: 2, expl: "ㄲ + ㅏ = 까." },
+          { q: "Manakah yang BUKAN 5 tegang?", options: ["ㄲ", "ㄸ", "ㅃ", "ㅋ"], correct: 3, expl: "ㅋ = aspirasi." },
+          { q: "'ㅃ' + 'ㅗ' menjadi...", options: ["보", "뽀", "포", "모"], correct: 1, expl: "ㅃ + ㅗ = 뽀." },
+          { q: "Tegang dari 'ㅈ' adalah...", options: ["ㅊ", "ㅉ", "ㅅ", "ㄲ"], correct: 1, expl: "ㅈ → ㅉ." },
+          { q: "Manakah yang berbunyi 'jja'?", options: ["자", "차", "짜", "사"], correct: 2, expl: "ㅉ + ㅏ = 짜." },
+          { q: "Perbedaan ㅅ dan ㅆ...", options: ["Panjang", "Tegang", "Keras"], correct: 1, expl: "ㅆ lebih tegang." },
+          { q: "Pasangan dasar-tegang benar?", options: ["ㄱ-ㄲ", "ㄴ-ㄸ", "ㄷ-ㅋ", "ㅂ-ㅍ"], correct: 0, expl: "ㄱ → ㄲ." },
+          { q: "'또' dibaca sebagai...", options: ["do", "to", "tto (tegang)", "ro"], correct: 2, expl: "ㄸ + ㅗ = 또." },
+          { q: "Manakah tegang 'p'?", options: ["ㅂ", "ㅍ", "ㅃ", "ㅁ"], correct: 2, expl: "ㅃ = p tegang." }
+        ]
+      },
+      {
+        day: 5, title: "Vokal Gabungan (Diftong)", desc: "ㅐ, ㅔ, ㅒ, ㅖ, ㅘ, ㅙ, ㅚ, ㅝ, ㅞ, ㅟ, ㅢ",
+        letters: [
+          { char: "ㅐ", rom: "ae" }, { char: "ㅔ", rom: "e" }, { char: "ㅒ", rom: "yae" }, { char: "ㅖ", rom: "ye" },
+          { char: "ㅘ", rom: "wa" }, { char: "ㅙ", rom: "wae" }, { char: "ㅚ", rom: "oe" }, { char: "ㅝ", rom: "wo" },
+          { char: "ㅞ", rom: "we" }, { char: "ㅟ", rom: "wi" }, { char: "ㅢ", rom: "ui" }
+        ],
+        quizzes: [
+          { q: "ㅗ + ㅏ membentuk...", options: ["워", "와", "위"], correct: 1, expl: "ㅗ+ㅏ = 와." },
+          { q: "'의' dibaca sebagai...", options: ["ui", "we", "oe"], correct: 0, expl: "ㅡ+ㅣ = 의." },
+          { q: "ㅘ terdiri dari...", options: ["ㅗ+ㅏ", "ㅜ+ㅓ", "ㅡ+ㅣ"], correct: 0, expl: "ㅗ+ㅏ = ㅘ." },
+          { q: "Manakah 'wae'?", options: ["ㅘ", "ㅙ", "ㅚ", "ㅝ"], correct: 1, expl: "ㅙ = wae." },
+          { q: "'ㅝ' dibaca sebagai...", options: ["wa", "wo", "we", "wi"], correct: 1, expl: "ㅝ = wo." },
+          { q: "Manakah 'oe'?", options: ["ㅙ", "ㅚ", "ㅞ", "ㅟ"], correct: 1, expl: "ㅚ = oe." },
+          { q: "'ㅢ' dibaca sebagai...", options: ["ui", "wi", "we", "wo"], correct: 0, expl: "ㅢ = ui." },
+          { q: "Manakah 'we'?", options: ["ㅙ", "ㅚ", "ㅞ", "ㅟ"], correct: 2, expl: "ㅞ = we." },
+          { q: "'ㅟ' dibaca sebagai...", options: ["ui", "wi", "we", "wo"], correct: 1, expl: "ㅟ = wi." },
+          { q: "Manakah yang BUKAN vokal gabungan?", options: ["ㅘ", "ㅙ", "ㅏ", "ㅝ"], correct: 2, expl: "ㅏ = vokal dasar." },
+          { q: "ㅜ + ㅓ membentuk...", options: ["와", "워", "위", "의"], correct: 1, expl: "ㅜ+ㅓ = 워." },
+          { q: "Manakah 'wae'?", options: ["ㅘ", "ㅙ", "ㅚ", "ㅝ"], correct: 1, expl: "ㅙ = wae." },
+          { q: "'ㅚ' + 'ㄱ' menjadi...", options: ["괴", "과", "궈", "귀"], correct: 0, expl: "ㄱ+ㅚ = 괴." },
+          { q: "Manakah 'we'?", options: ["ㅞ", "ㅟ", "ㅚ", "ㅙ"], correct: 0, expl: "ㅞ = we." },
+          { q: "Jumlah vokal gabungan?", options: ["11", "7", "5", "9"], correct: 0, expl: "11 vokal gabungan." },
+          { q: "Manakah 'yi'?", options: ["ㅢ", "ㅟ", "ㅞ", "ㅚ"], correct: 0, expl: "ㅢ = ui/yi." },
+          { q: "'ㅘ' + 'ㄱ' menjadi...", options: ["과", "궈", "괘", "괴"], correct: 0, expl: "ㄱ+ㅘ = 과." },
+          { q: "Manakah yang BUKAN 11 vokal gabungan?", options: ["ㅐ", "ㅔ", "ㅗ", "ㅘ"], correct: 2, expl: "ㅗ = vokal dasar." },
+          { q: "'ㅙ' + 'ㄱ' menjadi...", options: ["과", "괘", "궈", "괴"], correct: 1, expl: "ㄱ+ㅙ = 괘." },
+          { q: "Perbedaan ㅐ dan ㅔ...", options: ["Sama", "ㅐ lebih terbuka", "ㅔ lebih terbuka"], correct: 1, expl: "ㅐ lebih terbuka." },
+          { q: "'ㅒ' dibaca sebagai...", options: ["ae", "yae", "ye", "ya"], correct: 1, expl: "ㅒ = yae." },
+          { q: "Manakah 'ye'?", options: ["ㅒ", "ㅖ", "ㅔ", "ㅐ"], correct: 1, expl: "ㅖ = ye." }
+        ]
+      },
+      {
+        day: 6, title: "Batchim (Konsonan Penutup)", desc: "Aturan 7 bunyi akhir: k, n, t, l, m, p, ng",
+        letters: [
+          { char: "ㄱ", rom: "[k] contoh: 박=bak" },
+          { char: "ㄴ", rom: "[n] contoh: 산=san" },
+          { char: "ㄷ", rom: "[t] contoh: 받=bat" },
+          { char: "ㄹ", rom: "[l] contoh: 달=dal" },
+          { char: "ㅁ", rom: "[m] contoh: 감=gam" },
+          { char: "ㅂ", rom: "[p] contoh: 밥=bap" },
+          { char: "ㅇ", rom: "[ng] contoh: 강=gang" },
+          { char: "ㄱㄱ", rom: "k (밖=bak)" },
+          { char: "ㅅ", rom: "t (옷=ot)" },
+          { char: "ㅊ", rom: "t (꽃=kkot)" },
+          { char: "ㅌ", rom: "t (밭=bat)" }
+        ],
+        quizzes: [
+          { q: "'ㅅ' sebagai batchim (옷) dibaca...", options: ["s", "t", "k"], correct: 1, expl: "ㅅ akhir → [t]." },
+          { q: "'ㅇ' di akhir (강) berbunyi...", options: ["Diam", "ng", "m"], correct: 1, expl: "ㅇ akhir → [ng]." },
+          { q: "Manakah batchim 'p'?", options: ["밥", "받", "발", "방"], correct: 0, expl: "ㅂ akhir → [p]." },
+          { q: "Batchim 'ㄱ' (박) dibaca...", options: ["g", "k", "ng"], correct: 1, expl: "ㄱ akhir → [k]." },
+          { q: "Manakah batchim 'l'?", options: ["달", "닭", "담", "당"], correct: 0, expl: "ㄹ akhir → [l]." },
+          { q: "Batchim 'ㅁ' (감) dibaca...", options: ["m", "n", "ng"], correct: 0, expl: "ㅁ akhir → [m]." },
+          { q: "Manakah yang BUKAN 7 bunyi batchim?", options: ["k", "n", "t", "s"], correct: 3, expl: "7: k,n,t,l,m,p,ng." },
+          { q: "'ㄷ' sebagai batchim (받) dibaca...", options: ["d", "t", "k"], correct: 1, expl: "ㄷ akhir → [t]." },
+          { q: "Manakah batchim 'ng'?", options: ["방", "받", "발", "밥"], correct: 0, expl: "ㅇ akhir → [ng]." },
+          { q: "Batchim 'ㅂ' (집) dibaca...", options: ["b", "p", "m"], correct: 1, expl: "ㅂ akhir → [p]." },
+          { q: "Aturan utama batchim...", options: ["Semua sama", "Jadi 7 bunyi", "Diam"], correct: 1, expl: "Berubah jadi 7 bunyi." },
+          { q: "'ㄱ' sebagai batchim (국) dibaca...", options: ["g", "k", "ng"], correct: 1, expl: "ㄱ akhir → [k]." },
+          { q: "Manakah batchim 'n'?", options: ["난", "날", "남", "낭"], correct: 0, expl: "ㄴ akhir → [n]." },
+          { q: "Batchim 'ㅌ' (밭) dibaca...", options: ["t", "d", "k"], correct: 0, expl: "ㅌ akhir → [t]." },
+          { q: "Manakah yang BUKAN 7 bunyi batchim?", options: ["k", "n", "t", "h"], correct: 3, expl: "h tidak termasuk." },
+          { q: "'ㄹ' sebagai batchim (말) dibaca...", options: ["r", "l", "n"], correct: 1, expl: "ㄹ akhir → [l]." },
+          { q: "Batchim 'ㅍ' (엽) dibaca...", options: ["p", "b", "m"], correct: 0, expl: "ㅍ akhir → [p]." },
+          { q: "Manakah contoh batchim 't'?", options: ["곧", "골", "곰", "공"], correct: 0, expl: "ㄷ akhir → [t]." },
+          { q: "Jumlah bunyi batchim...", options: ["5", "7", "9", "11"], correct: 1, expl: "Ada 7 bunyi." },
+          { q: "Batchim 'ㅊ' (꽃) dibaca...", options: ["ch", "t", "k"], correct: 1, expl: "ㅊ akhir → [t]." },
+          { q: "Pasangan batchim benar?", options: ["ㄱ→k, ㄴ→n, ㄷ→t", "ㄱ→g, ㄴ→n, ㄷ→d", "ㄱ→ng, ㄴ→m, ㄷ→p"], correct: 0, expl: "ㄱ→k, ㄴ→n, ㄷ→t." },
+          { q: "'ㅆ' sebagai batchim (있다) dibaca...", options: ["s", "t", "k"], correct: 1, expl: "ㅆ akhir → [t]." }
+        ]
+      },
+      {
+        day: 7, title: "Praktik Total Kata Populer", desc: "안녕하세요, 감사합니다, 사랑해",
+        letters: [
+          { char: "안녕하세요", rom: "an-nyeong-ha-se-yo" },
+          { char: "감사합니다", rom: "gam-sa-ham-ni-da" },
+          { char: "사랑해", rom: "sa-rang-hae" },
+          { char: "사랑해요", rom: "sa-rang-hae-yo" },
+          { char: "미안해", rom: "mi-an-hae" },
+          { char: "고마워", rom: "go-ma-wo" },
+          { char: "잘가", rom: "jal-ga" }
+        ],
+        quizzes: [
+          { q: "'안녕하세요' dibaca sebagai...", options: ["an-nyeong-ha-se-yo", "am-nyeong-ga-se-yo", "a-nyeong-ha-sae-yo"], correct: 0, expl: "안녕하세요 = an-nyeong-ha-se-yo." },
+          { q: "Penulisan 'Saranghae'?", options: ["사람해", "사랑해", "사란해"], correct: 1, expl: "사랑해." },
+          { q: "'감사합니다' artinya...", options: ["Halo", "Terima kasih", "Sampai jumpa", "Maaf"], correct: 1, expl: "Terima kasih." },
+          { q: "Penulisan 'Halo' benar?", options: ["안녕하세요", "안녕", "여보세요", "안녀하세요"], correct: 0, expl: "안녕하세요." },
+          { q: "Bunyi 'ㅇ' dalam '안녕'?", options: ["Diam awal, ng akhir", "Selalu ng", "Selalu diam"], correct: 0, expl: "Awal diam, akhir ng." },
+          { q: "'사랑해' artinya...", options: ["Aku rindu", "Aku suka", "Aku cinta", "Aku bahagia"], correct: 2, expl: "Aku cinta." },
+          { q: "Bentuk sopan 'Terima kasih'?", options: ["고마워", "감사합니다", "천만에요", "괜찮아요"], correct: 1, expl: "감사합니다." },
+          { q: "Bunyi 'ㅎ' dalam '사랑해'?", options: ["h", "diam", "ng"], correct: 0, expl: "ㅎ = h." },
+          { q: "Manakah yang BUKAN kata Korea?", options: ["안녕하세요", "사랑해", "감사합니다", "아리가또"], correct: 3, expl: "아리가또 = Jepang." },
+          { q: "'안녕하세요' berapa suku kata?", options: ["4", "5", "6", "7"], correct: 1, expl: "5 suku kata." },
+          { q: "Penulisan 'Terima kasih' benar?", options: ["감사합니다", "감사합나다", "감사함니다"], correct: 0, expl: "감사합니다." },
+          { q: "Romanisasi '사랑해'?", options: ["saranghae", "salanhae", "saranghe", "saranhae"], correct: 0, expl: "saranghae." },
+          { q: "Manakah kata sapaan?", options: ["사랑해", "안녕하세요", "감사합니다", "미안해"], correct: 1, expl: "안녕하세요." },
+          { q: "Bunyi 'ㄴ' dalam '안녕'?", options: ["n", "l", "ng"], correct: 0, expl: "ㄴ = n." },
+          { q: "Bentuk informal 'Terima kasih'?", options: ["감사합니다", "고마워", "천만에요", "괜찮아"], correct: 1, expl: "고마워." },
+          { q: "'사랑해' berapa blok?", options: ["3", "4", "5", "6"], correct: 0, expl: "사-랑-해 = 3." },
+          { q: "Manakah yang BUKAN kata Korea?", options: ["안녕하세요", "사랑해", "감사합니다", "오하이요"], correct: 3, expl: "오하이요 = Jepang." },
+          { q: "Bunyi 'ㄱ' dalam '감사합니다'?", options: ["g", "k", "ng"], correct: 0, expl: "ㄱ = g." },
+          { q: "Manakah yang pakai batchim?", options: ["안녕", "하세요", "사랑해", "감사"], correct: 0, expl: "안녕 punya batchim." },
+          { q: "'안녕하세요' berapa blok?", options: ["5", "7", "4", "6"], correct: 0, expl: "5 blok." },
+          { q: "Bentuk paling sopan 'Halo'?", options: ["안녕", "안녕하세요", "여보세요", "안녕하십니까"], correct: 3, expl: "안녕하십니까." },
+          { q: "Arti '감사합니다'?", options: ["Selamat pagi", "Sampai jumpa", "Terima kasih", "Maaf"], correct: 2, expl: "Terima kasih." }
+        ]
+      }
+    ];
+
+    // ============================================
+    // APLIKASI LOGIC
+    // ============================================
+    let currentDayIndex = 0;
+    let currentQuizIndex = 0;
+    let userScore = 0;
+    let completedDays = [];
+    let dayScores = {};
+
+    function saveProgress() {
+      localStorage.setItem('hangeulProgress', JSON.stringify({ completedDays, dayScores, lastUpdated: new Date().toISOString() }));
+    }
+
+    function loadProgress() {
+      const saved = localStorage.getItem('hangeulProgress');
+      if (saved) {
+        try {
+          const p = JSON.parse(saved);
+          completedDays = p.completedDays || [];
+          dayScores = p.dayScores || {};
+          return true;
+        } catch(e) { return false; }
+      }
+      return false;
+    }
+
+    function resetProgress() {
+      if (confirm('Yakin ingin mereset semua progress?')) {
+        localStorage.removeItem('hangeulProgress');
+        completedDays = [];
+        dayScores = {};
+        renderHome();
+        updateProgressDisplay();
+        alert('✅ Progress berhasil direset!');
+      }
+    }
+
+    function playKoreanAudio(text) {
+      if ('speechSynthesis' in window) {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'ko-KR';
+        u.rate = 0.8;
+        window.speechSynthesis.speak(u);
+      }
+    }
+
+    function updateProgressDisplay() {
+      const total = courseData.length;
+      const done = completedDays.length;
+      const percent = Math.round((done / total) * 100);
+      document.getElementById('progressSummary').textContent = `${done} dari ${total} hari selesai`;
+      document.getElementById('progressPercent').textContent = `${percent}%`;
+      document.getElementById('progressBar').style.width = `${percent}%`;
+      
+      document.querySelectorAll('.day-item').forEach((item, idx) => {
+        const dayNum = idx + 1;
+        const badge = item.querySelector('.day-badge');
+        if (completedDays.includes(dayNum)) {
+          badge.textContent = '✅ Selesai';
+          badge.className = 'badge-done day-badge';
+          item.classList.add('border-emerald-300', 'bg-emerald-50/50');
+        } else {
+          badge.textContent = `H${dayNum}`;
+          badge.className = 'w-10 h-10 rounded-xl bg-[#C60E2E]/10 text-[#C60E2E] font-bold flex items-center justify-center text-sm day-badge';
+          item.classList.remove('border-emerald-300', 'bg-emerald-50/50');
+        }
+      });
+    }
+
+    function renderHome() {
+      const listEl = document.getElementById("dayList");
+      listEl.innerHTML = "";
+      courseData.forEach((item, index) => {
+        const dayNum = item.day;
+        const isDone = completedDays.includes(dayNum);
+        const score = dayScores[dayNum] || 0;
+        const totalQ = item.quizzes.length;
+        const btn = document.createElement("button");
+        btn.className = `day-item w-full bg-white border ${isDone ? 'border-emerald-300 bg-emerald-50/50' : 'border-slate-200 hover:border-[#C60E2E]'} hover:shadow-md p-4 rounded-2xl flex items-center justify-between text-left transition`;
+        btn.onclick = () => openDay(index);
+        btn.innerHTML = `
+          <div class="flex items-center gap-3.5">
+            <div class="day-badge w-10 h-10 rounded-xl ${isDone ? 'bg-emerald-100 text-emerald-700' : 'bg-[#C60E2E]/10 text-[#C60E2E]'} font-bold flex items-center justify-center text-sm">
+              ${isDone ? '✅' : `H${dayNum}`}
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-800 text-sm">${item.title}</h3>
+              <p class="text-xs text-slate-400 mt-0.5">${item.desc}</p>
+              ${isDone ? `<p class="text-xs text-emerald-600 font-semibold mt-0.5">✅ Selesai (${score}/${totalQ})</p>` : `<p class="text-xs text-slate-400 mt-0.5">${totalQ} soal</p>`}
+            </div>
+          </div>
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        `;
+        listEl.appendChild(btn);
+      });
+      updateProgressDisplay();
+    }
+
+    function openDay(index) {
+      currentDayIndex = index;
+      const data = courseData[index];
+      document.getElementById("appTitle").innerText = `Hari ${data.day}: ${data.title}`;
+      const lessonEl = document.getElementById("lessonContent");
+      lessonEl.innerHTML = `
+        <p class="text-xs text-slate-500 mb-2">Ketuk kartu untuk mendengarkan pelafalan:</p>
+        <div class="grid grid-cols-2 gap-2.5">
+          ${data.letters.map(l => `
+            <div onclick="playKoreanAudio('${l.char}')" class="cursor-pointer bg-slate-50 hover:bg-[#C60E2E]/10 border border-slate-200 hover:border-[#C60E2E] p-3 rounded-xl flex items-center justify-between transition">
+              <span class="text-xl font-bold text-[#C60E2E]">${l.char}</span>
+              <span class="text-xs font-semibold text-slate-500">${l.rom} 🔊</span>
+            </div>
+          `).join('')}
+        </div>
+        <p class="text-xs text-slate-400 mt-2">* Total ${data.letters.length} kartu yang dipelajari</p>
+      `;
+      switchTab('lesson');
+      showScreen('study');
+    }
+
+    function switchTab(tab) {
+      const isLesson = tab === 'lesson';
+      document.getElementById("tabLesson").classList.toggle("hidden", !isLesson);
+      document.getElementById("tabQuiz").classList.toggle("hidden", isLesson);
+      document.getElementById("quizResult").classList.add("hidden");
+      document.getElementById("tabLessonBtn").className = isLesson 
+        ? "flex-1 py-2 font-bold text-xs rounded-lg bg-white shadow-sm text-[#C60E2E] transition"
+        : "flex-1 py-2 font-bold text-xs rounded-lg text-slate-500 hover:text-slate-800 transition";
+      document.getElementById("tabQuizBtn").className = !isLesson 
+        ? "flex-1 py-2 font-bold text-xs rounded-lg bg-white shadow-sm text-[#C60E2E] transition"
+        : "flex-1 py-2 font-bold text-xs rounded-lg text-slate-500 hover:text-slate-800 transition";
+      if (!isLesson) startQuiz();
+    }
+
+    function startQuiz() {
+      currentQuizIndex = 0;
+      userScore = 0;
+      renderCurrentQuestion();
+    }
+
+    function renderCurrentQuestion() {
+      const quizzes = courseData[currentDayIndex].quizzes;
+      const q = quizzes[currentQuizIndex];
+      const container = document.getElementById("quizContainer");
+      container.innerHTML = `
+        <div class="flex justify-between items-center text-xs font-bold text-slate-400 mb-2">
+          <span>PERTANYAAN ${currentQuizIndex + 1} DARI ${quizzes.length}</span>
+          <span>SKOR: ${userScore}</span>
+        </div>
+        <h4 class="text-base font-bold text-slate-800 mb-4">${q.q}</h4>
+        <div class="space-y-2.5">
+          ${q.options.map((opt, i) => `
+            <button onclick="checkAnswer(${i})" class="quiz-opt w-full text-left p-3.5 rounded-xl border border-slate-200 text-sm font-semibold hover:border-[#C60E2E] transition bg-slate-50">
+              ${opt}
+            </button>
+          `).join('')}
+        </div>
+        <div id="quizFeedback" class="hidden mt-4 p-3 rounded-xl text-xs font-semibold"></div>
+      `;
+    }
+
+    function checkAnswer(chosenIndex) {
+      const q = courseData[currentDayIndex].quizzes[currentQuizIndex];
+      const feedback = document.getElementById("quizFeedback");
+      const buttons = document.querySelectorAll(".quiz-opt");
+      buttons.forEach(btn => btn.disabled = true);
+      if (chosenIndex === q.correct) {
+        userScore++;
+        buttons[chosenIndex].classList.add("bg-emerald-100", "border-emerald-500", "text-emerald-900");
+        feedback.className = "mt-4 p-3 rounded-xl text-xs bg-emerald-50 text-emerald-800 border border-emerald-200 block";
+        feedback.innerHTML = `✅ Benar! ${q.expl}`;
+      } else {
+        buttons[chosenIndex].classList.add("bg-rose-100", "border-rose-500", "text-rose-900");
+        buttons[q.correct].classList.add("bg-emerald-100", "border-emerald-500", "text-emerald-900");
+        feedback.className = "mt-4 p-3 rounded-xl text-xs bg-rose-50 text-rose-800 border border-rose-200 block";
+        feedback.innerHTML = `❌ Kurang tepat. ${q.expl}`;
+      }
+      setTimeout(() => {
+        if (currentQuizIndex + 1 < courseData[currentDayIndex].quizzes.length) {
+          currentQuizIndex++;
+          renderCurrentQuestion();
+        } else {
+          showQuizResult();
+        }
+      }, 1800);
+    }
+
+    function showQuizResult() {
+      document.getElementById("quizContainer").innerHTML = "";
+      document.getElementById("quizResult").classList.remove("hidden");
+      const total = courseData[currentDayIndex].quizzes.length;
+      const dayNum = courseData[currentDayIndex].day;
+      dayScores[dayNum] = userScore;
+      const passThreshold = Math.ceil(total * 0.7);
+      if (userScore >= passThreshold && !completedDays.includes(dayNum)) {
+        completedDays.push(dayNum);
+        completedDays.sort((a, b) => a - b);
+      }
+      saveProgress();
+      document.getElementById("scoreText").innerHTML = `
+        Kamu menjawab ${userScore} dari ${total} soal dengan benar.<br>
+        ${userScore >= passThreshold ? '🎊 Selamat! Kamu lulus hari ini!' : '💪 Jangan menyerah! Coba lagi lain waktu.'}
+        ${completedDays.includes(dayNum) ? ' ✅ Hari ini sudah ditandai selesai!' : ''}
+      `;
+      renderHome();
+    }
+
+    function showScreen(screen) {
+      const isHome = screen === 'home';
+      document.getElementById("screenHome").classList.toggle("hidden", !isHome);
+      document.getElementById("screenStudy").classList.toggle("hidden", isHome);
+      document.getElementById("btnBack").classList.toggle("hidden", isHome);
+      if (isHome) {
+        document.getElementById("appTitle").innerText = "Hangeul 7 Hari 🇰🇷";
+        renderHome();
+        updateProgressDisplay();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadProgress();
+      const sc = document.getElementById('sparkles');
+      for (let i = 0; i < 30; i++) {
+        const s = document.createElement('div');
+        s.className = 'sparkle';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        s.style.animationDelay = Math.random() * 3 + 's';
+        s.style.animationDuration = (2 + Math.random() * 3) + 's';
+        sc.appendChild(s);
+      }
+      setTimeout(() => {
+        document.getElementById('splashScreen').classList.add('hide');
+        setTimeout(() => document.getElementById('splashScreen').style.display = 'none', 800);
+      }, 2500);
+      setTimeout(() => { renderHome(); updateProgressDisplay(); }, 100);
+    });
+
+    renderHome();
+    updateProgressDisplay();
+  </script>
+</body>
+</html>
